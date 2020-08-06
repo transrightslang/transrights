@@ -5,9 +5,11 @@ mod ast;
 lalrpop_mod!(pub grammar);
 
 fn main() {
-    let parser = grammar::StatementParser::new();
-    let data = parser.parse("(object sel:(object sel:val) sel:(object sel: val))").unwrap();
+    let parser = grammar::StatementListParser::new();
+    let prog = r#"
+    data := "yeet"
+    (Logger print:data)
+    "#;
+    let data = parser.parse(prog).unwrap();
     println!("{:#?}", data);
-    assert!(parser.parse("(object sel:(object sel:val))").is_ok());
-    assert!(!parser.parse("(object sel:(object sel:(val))").is_ok());
 }

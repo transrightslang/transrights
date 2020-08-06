@@ -1,4 +1,4 @@
-use crate::ast::{Statement,Selector};
+use crate::ast::{Statement,Selector,Literal};
 
 grammar;
 
@@ -13,7 +13,18 @@ pub SelectorList: Vec<Selector> = {
 
 pub Message: Statement = {
     "(" <i:Identifier> <s:SelectorList> ")" => Statement::Message(i, s),
-    <i:Identifier> => Statement::Literal(i),
+};
+
+pub Literal: Statement = {
+    <x:r#""(([^\\"]|\\.)*)""#> => Statement::Literal(Literal::Str(x[1..(x.len() - 1)].to_string())),
+};
+
+pub VarDeclaration: Statement = {
+    <i:Identifier> ":=" <s:Statement> => Statement::VarDeclaration(i, s)
+};
+
+pub VarDefinition: Statement = {
+    <i:Identifier> "=" <s:Statement> => Statement::VarDefinition(i, s)
 };
 
 pub Identifier: String = {
@@ -22,4 +33,13 @@ pub Identifier: String = {
 
 pub Statement: Box<Statement> = {
     <m:Message> => Box::new(m),
+    <l:Literal> => Box::new(l),
+    <v:VarDeclaration> => Box::new(v),
+    <v:VarDefinition> => Box::new(v),
+};
+
+pub StatementList: Vec<Box<Statement>> = {
+    <sl:StatementList> ";" <s:Statement> => [sl, vec![s]].concat(),
+    <sl:StatementList> "\n" <s:Statement> => [sl, vec![s]].concat(),
+    <s:Statement> => vec![s],
 };
