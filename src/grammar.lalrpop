@@ -1,0 +1,25 @@
+use crate::ast::{Statement,Selector};
+
+grammar;
+
+pub Selector: Selector = {
+    <i:Identifier> ":" <s:Statement> => Selector{selector: i, value: s}
+};
+
+pub SelectorList: Vec<Selector> = {
+    <sl:SelectorList> <s:Selector> => [sl, vec![s]].concat(),
+    <s:Selector> => vec![s],
+}
+
+pub Message: Statement = {
+    "(" <i:Identifier> <s:SelectorList> ")" => Statement::Message(i, s),
+    <i:Identifier> => Statement::Literal(i),
+};
+
+pub Identifier: String = {
+    r"[a-zA-Z][0-9a-zA-Z]+" => <>.to_string(),
+};
+
+pub Statement: Box<Statement> = {
+    <m:Message> => Box::new(m),
+};
