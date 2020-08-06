@@ -7,6 +7,9 @@ lalrpop_mod!(pub grammar);
 fn main() {
     let parser = grammar::StatementListParser::new();
     let prog = r#"
+        func NewLogger color:color replies Logger {
+            ();
+        };
         (Logger output:`data`);
         ok := ko;
     "#;

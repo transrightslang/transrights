@@ -1,4 +1,4 @@
-use crate::ast::{Statement,Selector,Literal};
+use crate::ast::*;
 
 grammar;
 
@@ -31,12 +31,29 @@ pub Identifier: String = {
     r"[a-zA-Z][0-9a-zA-Z]+" => <>.to_string(),
 };
 
+pub Argument: Argument = {
+    <i1:Identifier> ":" <i2:Identifier> => Argument{name: i1, kind: i2}
+};
+
+pub ArgumentList: Vec<Argument> = {
+    <al:ArgumentList> <a:Argument> => [al, vec![a]].concat(),
+    <a:Argument> => vec![a],
+}
+
+pub Function: Statement = {
+    "func" <i:Identifier> <al:ArgumentList> "replies" <r:Identifier> "{"
+        <sl: StatementList>
+    "}" => Statement::Function(Function{name: i, arguments: al, replies: r, statements: sl})
+};
+
 pub Statement: Box<Statement> = {
     <m:Message> => Box::new(m),
     <l:Literal> => Box::new(l),
     <i:Identifier> => Box::new(Statement::Ident(i)),
     <v:VarDeclaration> => Box::new(v),
     <v:VarDefinition> => Box::new(v),
+    <f:Function> => Box::new(f),
+    "()" => Box::new(Statement::NOOP),
 };
 
 pub StatementList: Vec<Box<Statement>> = {
