@@ -16,7 +16,7 @@ pub Message: Statement = {
 };
 
 pub Literal: Statement = {
-    <x:r#"`(.*)`"#> => Statement::Literal(Literal::Str(x[1..(x.len() - 1)].to_string())),
+    <x:r#"`[^`]*`"#> => Statement::Literal(Literal::Str(x[1..(x.len() - 1)].to_string())),
 };
 
 pub VarDeclaration: Statement = {
@@ -34,12 +34,14 @@ pub Identifier: String = {
 pub Statement: Box<Statement> = {
     <m:Message> => Box::new(m),
     <l:Literal> => Box::new(l),
+    <i:Identifier> => Box::new(Statement::Ident(i)),
     <v:VarDeclaration> => Box::new(v),
     <v:VarDefinition> => Box::new(v),
 };
 
 pub StatementList: Vec<Box<Statement>> = {
-    <sl:StatementList> ";" <s:Statement> => [sl, vec![s]].concat(),
-    <sl:StatementList> "\n" <s:Statement> => [sl, vec![s]].concat(),
     <s:Statement> => vec![s],
+    <sl:StatementList> ";" => sl,
+    <sl:StatementList> ";" <s:Statement> => [sl, vec![s]].concat(),
 };
+

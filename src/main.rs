@@ -7,8 +7,8 @@ lalrpop_mod!(pub grammar);
 fn main() {
     let parser = grammar::StatementListParser::new();
     let prog = r#"
-    data := `yeet`;
-    (Logger print:data);
+        (Logger output:`data`);
+        ok := ko;
     "#;
     let data = match parser.parse(prog) {
         Ok(val) => val,

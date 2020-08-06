@@ -5,11 +5,12 @@ pub struct Selector {
 }
 #[derive(Debug,Clone)]
 pub enum Literal {
-    Str(String)
+    Str(String),
 }
 #[derive(Debug, Clone)]
 pub enum Statement {
     Literal(Literal),
+    Ident(String),
     Message(String, Vec<Selector>),
     VarDeclaration(String, Box<Statement>),
     VarDefinition(String, Box<Statement>),
