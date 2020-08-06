@@ -16,7 +16,7 @@ pub Message: Statement = {
 };
 
 pub Literal: Statement = {
-    <x:r#""(([^\\"]|\\.)*)""#> => Statement::Literal(Literal::Str(x[1..(x.len() - 1)].to_string())),
+    <x:r#"`(.*)`"#> => Statement::Literal(Literal::Str(x[1..(x.len() - 1)].to_string())),
 };
 
 pub VarDeclaration: Statement = {

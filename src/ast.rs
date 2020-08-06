@@ -13,4 +13,5 @@ pub enum Statement {
     Message(String, Vec<Selector>),
     VarDeclaration(String, Box<Statement>),
     VarDefinition(String, Box<Statement>),
+    EOF,
 }
