@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 
-namespace rjiendaujughyi
+namespace rjiendaujughyi.AST
 {
     public interface IAcui { }
+    public interface IAcuiStatement : IAcui {}
     public interface IAcuiExpr : IAcui { }
     public interface IAcuiLiteral : IAcuiExpr { }
     public class AcuiIdentifierLiteral : IAcuiLiteral

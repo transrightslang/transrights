@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 
 namespace rjiendaujughyi
 {
@@ -7,7 +6,7 @@ namespace rjiendaujughyi
     {
         static void Main(string[] args)
         {
-            var result = AcuiParser.Parse(@"
+            var result = Parser.AcuiParser.Parse(@"
 (Logger send:`data` to:`target`)
 (Logger send:`data`)
 ");

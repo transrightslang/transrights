@@ -2,8 +2,9 @@ using System.Linq;
 using Pidgin;
 using static Pidgin.Parser;
 using static Pidgin.Parser<char>;
+using rjiendaujughyi.AST;
 
-namespace rjiendaujughyi
+namespace rjiendaujughyi.Parser
 {
     public static class AcuiParser
     {
