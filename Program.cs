@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace rjiendaujughyi
 {
@@ -6,13 +7,19 @@ namespace rjiendaujughyi
     {
         static void Main(string[] args)
         {
-            var result = AcuiParser.Parse(@"(Logger send:`data` to:`target`)");
+            var result = AcuiParser.Parse(@"
+(Logger send:`data` to:`target`)
+(Logger send:`data`)
+");
             if (result.Success) {
-                Console.WriteLine($"Succeeded!\nResult: {result.Value}");
+                Console.WriteLine($"Succeeded!");
+                foreach (var item in result.Value)
+                {
+                    Console.WriteLine($"{item}");
+                }
             } else {
                 Console.WriteLine($"Failed!\nResult: {result.Error}");
             }
-            Console.WriteLine("Hello World!");
         }
     }
 }

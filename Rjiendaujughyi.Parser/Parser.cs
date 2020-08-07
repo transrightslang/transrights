@@ -10,8 +10,8 @@ namespace rjiendaujughyi
         private static readonly Pidgin.Parser<char, char> LParen = Char('(');
         private static readonly Pidgin.Parser<char, char> RParen = Char(')');
         private static readonly Pidgin.Parser<char, char> Colon = Char(':');
-        private static readonly Parser<char, char> ColonWhitespace =
-            Colon.Between(SkipWhitespaces);
+        private static readonly Parser<char, char> ColonWhitespace = Colon.Between(SkipWhitespaces);
+        private static readonly Parser<char, char> EndOfStatement = Char(';').Or(EndOfLine.ThenReturn(';')).Or(End.ThenReturn(';'));
         private static readonly Pidgin.Parser<char, char> Quote = Char('`');
         private static readonly Pidgin.Parser<char, string> String = Token(c => c != '`').ManyString().Between(Quote);
         private static readonly Pidgin.Parser<char, IAcui> AcuiIdentifier =
@@ -51,6 +51,6 @@ namespace rjiendaujughyi
         private static readonly Pidgin.Parser<char, IAcui> AcuiString = String.Select<IAcui>(s => new AcuiStringLiteral { value = s });
         private static readonly Pidgin.Parser<char, IAcui> Expression = OneOf(AcuiString, AcuiMessage);
 
-        public static Pidgin.Result<char, IAcui> Parse(string input) => Expression.Between(SkipWhitespaces).Parse(input);
+        public static Pidgin.Result<char, System.Collections.Generic.IEnumerable<IAcui>> Parse(string input) => SkipWhitespaces.Then(Expression.Before(EndOfStatement).Many()).Parse(input);
     }
 }
