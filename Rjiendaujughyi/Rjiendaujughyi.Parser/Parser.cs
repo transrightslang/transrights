@@ -51,7 +51,22 @@ namespace rjiendaujughyi.Parser
                 );
         private static readonly Pidgin.Parser<char, IAcui> AcuiString = String.Select<IAcui>(s => new AcuiStringLiteral { value = s });
         private static readonly Pidgin.Parser<char, IAcui> Expression = OneOf(AcuiString, AcuiMessage);
+        private static readonly Pidgin.Parser<char, IAcui> Statement = OneOf(Expression).Before(EndOfStatement);
+        private static readonly Pidgin.Parser<char, IAcuiTopLevel> Function =
+                Map(
+                    (_func, identifier, _lbracket, statements, _rbracket) =>
+                    {
+                        IAcuiTopLevel function = new AcuiFunction
+                        {
+                            name = (AcuiIdentifierLiteral)identifier,
+                            statements = statements.ToList().ConvertAll(s => (IAcuiStatement)s)
+                        };
+                        return function;
+                    },
+                    String("func"), AcuiIdentifier.Between(SkipWhitespaces), Char('{'), SkipWhitespaces.Then(Statement.Many()), Char('}')
+                );
+        private static readonly Pidgin.Parser<char, IAcuiTopLevel> TopLevel = OneOf(Function).Before(EndOfStatement);
 
-        public static Pidgin.Result<char, System.Collections.Generic.IEnumerable<IAcui>> Parse(string input) => SkipWhitespaces.Then(Expression.Before(EndOfStatement).Many()).Parse(input);
+        public static Pidgin.Result<char, System.Collections.Generic.IEnumerable<IAcuiTopLevel>> Parse(string input) => SkipWhitespaces.Then(TopLevel.Many()).Parse(input);
     }
 }

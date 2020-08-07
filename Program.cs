@@ -7,8 +7,9 @@ namespace rjiendaujughyi
         static void Main(string[] args)
         {
             var result = Parser.AcuiParser.Parse(@"
-(Logger send:`data` to:`target`)
-(Logger send:`data`)
+func Main {
+    (Logger send:`data` to:`target`)
+}
 ");
             if (result.Success) {
                 Console.WriteLine($"Succeeded!");

@@ -3,9 +3,18 @@ using System.Collections.Generic;
 namespace rjiendaujughyi.AST
 {
     public interface IAcui { }
+    public interface IAcuiTopLevel : IAcui {}
     public interface IAcuiStatement : IAcui {}
-    public interface IAcuiExpr : IAcui { }
+    public interface IAcuiExpr : IAcuiStatement { }
     public interface IAcuiLiteral : IAcuiExpr { }
+    public class AcuiFunction : IAcuiTopLevel
+    {
+        public AcuiIdentifierLiteral name { get; set; }
+        public List<IAcuiStatement> statements { get; set; }
+        public override string ToString() {
+            return $"func {name.reference} {'{'}\n{statements.ConvertAll(s => '\n'+s.ToString())}\n{'}'}";
+        }
+    }
     public class AcuiIdentifierLiteral : IAcuiLiteral
     {
         public string reference { get; set; }
