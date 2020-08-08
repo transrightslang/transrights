@@ -2,9 +2,9 @@ using System.Linq;
 using Pidgin;
 using static Pidgin.Parser;
 using static Pidgin.Parser<char>;
-using rjiendaujughyi.AST;
+using acui.AST;
 
-namespace rjiendaujughyi.Parser
+namespace acui.Parser
 {
     public static class AcuiParser
     {
@@ -71,6 +71,7 @@ namespace rjiendaujughyi.Parser
                 },
                 AcuiIdentifier, LParen, Rec(() => Expression.Separated(Comma)), RParen
             );
+        private static readonly Pidgin.Parser<char, IAcuiTopLevel> AcuiImport = String("import").Then(SkipWhitespaces).Then(String).Select<IAcuiTopLevel>(input => new AcuiImport { import = input });
         private static readonly Pidgin.Parser<char, IAcui> AcuiString = String.Select<IAcui>(s => new AcuiStringLiteral { value = s });
         private static readonly Pidgin.Parser<char, IAcui> AcuiInteger = Num.Select<IAcui>(value => new AcuiIntegerLiteral { value = value });
         private static readonly Pidgin.Parser<char, IAcui> Expression = OneOf(AcuiString, AcuiInteger, AcuiMessage, AcuiFunctionCall);
@@ -91,7 +92,7 @@ namespace rjiendaujughyi.Parser
                     },
                     String("func"), AcuiIdentifier.Between(SkipWhitespaces), AcuiArgumentName.Between(SkipWhitespaces).Many(), Replies.Between(SkipWhitespaces).Optional(), Char('{'), SkipWhitespaces.Then(Statement).Many(), Char('}')
                 );
-        private static readonly Pidgin.Parser<char, IAcuiTopLevel> TopLevel = OneOf(FunctionDefinition).Before(EndOfStatement);
+        private static readonly Pidgin.Parser<char, IAcuiTopLevel> TopLevel = OneOf(FunctionDefinition, AcuiImport).Before(EndOfStatement).Between(SkipWhitespaces);
 
         public static Pidgin.Result<char, System.Collections.Generic.IEnumerable<IAcuiTopLevel>> Parse(string input) => SkipWhitespaces.Then(TopLevel.Many()).Parse(input);
     }

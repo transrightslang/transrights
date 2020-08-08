@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace rjiendaujughyi.AST
+namespace acui.AST
 {
     public interface IAcui {
         string Transpile();
@@ -23,7 +23,13 @@ namespace rjiendaujughyi.AST
             return $"func {name.reference} {string.Join(' ', arguments.ConvertAll(a => a.Item1.ToString() + ":" + a.Item2.ToString()))} {(replies != null ? "-> " + replies.ToString() : "")} {'{'}\n{string.Join('\n', statements.ConvertAll(s => '\t'+s.ToString()))}\n{'}'}";
         }
         public string Transpile() =>
-            $"{(replies != null ? replies.Transpile() : "void")} {name.reference} ({string.Join(", ", arguments.ConvertAll(a => a.Item2.Transpile() + " " + a.Item1.Transpile()))}) {'{'}\n{string.Join('\n', statements.ConvertAll(s => '\t'+s.Transpile()))}\n{'}'}";
+            $"{(replies != null ? replies.Transpile() : "void")} {name.reference} ({string.Join(", ", arguments.ConvertAll(a => a.Item2.Transpile() + " " + a.Item1.Transpile()))}) {'{'}\n{string.Join("\n", statements.ConvertAll(s => '\t'+s.Transpile()+";"))}\n{'}'}";
+    }
+    public class AcuiImport : IAcuiTopLevel
+    {
+        public string import { get; set; }
+        public override string ToString() => $"import {import}";
+        public string Transpile() => $"#include {import}";
     }
 
     ///
