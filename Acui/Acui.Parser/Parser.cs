@@ -36,7 +36,7 @@ namespace acui.Parser
                         return (((AcuiIdentifierLiteral)ident).reference, (IAcuiExpr)value);
                     },
                     AcuiIdentifier, ColonWhitespace, Rec(() => Expression)
-                );
+                ).Or(Char('.').Then(AcuiIdentifier).Select<(string, IAcuiExpr)>(i => (((AcuiIdentifierLiteral)i).reference, null)));
         private static readonly Pidgin.Parser<char, (IAcui, IAcui)> AcuiArgumentName =
                 Map(
                     (ident, _colon, value) =>

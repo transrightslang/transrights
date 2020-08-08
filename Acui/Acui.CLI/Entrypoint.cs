@@ -12,6 +12,8 @@ namespace acui.CLI
         public string input { get; set; }
         [Option('o', "output", Required = true, HelpText = "The binary to output to.")]
         public string output { get; set; }
+        [Option('v', "verbose", Default = false)]
+        public bool verbose { get; set; }
     }
     class Entry
     {
@@ -22,6 +24,9 @@ namespace acui.CLI
             if (result.Success) {
                 using (var process = new Process()) {
                     process.StartInfo.FileName = "gcc";
+                    process.StartInfo.ArgumentList.Add("-I/usr/include/Acui");
+                    process.StartInfo.ArgumentList.Add("-lAcuiFoundationKit");
+                    process.StartInfo.ArgumentList.Add("-g");
                     process.StartInfo.ArgumentList.Add("-o");
                     process.StartInfo.ArgumentList.Add(opts.output);
                     process.StartInfo.ArgumentList.Add("-x");
@@ -34,9 +39,14 @@ namespace acui.CLI
 
                     var writer = process.StandardInput;
 
+                    writer.WriteLine($"#include <FoundationKit/Foundation.h>");
+
                     foreach (var item in result.Value)
                     {
                         writer.WriteLine($"{item.Transpile()}");
+                        if (opts.verbose) {
+                            Console.WriteLine($"{item.Transpile()}");
+                        }
                     }
 
                     writer.Close();

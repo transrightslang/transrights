@@ -1,0 +1,4 @@
+func main {
+    (Logger print:`hello\n`)
+    exit(0)
+}
