@@ -12,6 +12,8 @@ namespace acui.Parser
         private static readonly Pidgin.Parser<char, char> RParen = Char(')');
         private static readonly Pidgin.Parser<char, char> Colon = Char(':');
         private static readonly Pidgin.Parser<char, char> Comma = Char(',');
+        private static readonly Pidgin.Parser<char, string> DeclaringEquals = String(":=");
+        private static readonly Pidgin.Parser<char, char> AssigningEquals = Char('=');
         private static readonly Parser<char, char> ColonWhitespace = Colon.Between(SkipWhitespaces);
         private static readonly Parser<char, char> EndOfStatement = Char(';').Or(EndOfLine.ThenReturn(';')).Or(End.ThenReturn(';'));
         private static readonly Pidgin.Parser<char, char> Quote = Char('`');
@@ -45,6 +47,31 @@ namespace acui.Parser
                     },
                     AcuiIdentifier, ColonWhitespace, AcuiIdentifier
                 );
+        private static readonly Pidgin.Parser<char, IAcui> AcuiVarDecl =
+                Map(
+                    (nameof, _sign, value) =>
+                    {
+                        IAcui ret = new AcuiVariableDefinition {
+                            name = (AcuiIdentifierLiteral) nameof,
+                            value = (IAcuiExpr) value,
+                        };
+                        return ret;
+                    },
+                    AcuiIdentifier, DeclaringEquals.Between(SkipWhitespaces), Rec(() => Expression)
+                );
+        private static readonly Pidgin.Parser<char, IAcui> AcuiReply = String("reply").Then(SkipWhitespaces).Then(Rec(() => Expression)).Select<IAcui>(item => new AcuiReply{ value = (IAcuiExpr)item });
+        private static readonly Pidgin.Parser<char, IAcui> AcuiVarAssign =
+                Map(
+                    (nameof, _sign, value) =>
+                    {
+                        IAcui ret = new AcuiVariableAssignment {
+                            name = (AcuiIdentifierLiteral) nameof,
+                            value = (IAcuiExpr) value,
+                        };
+                        return ret;
+                    },
+                    AcuiIdentifier, AssigningEquals.Between(SkipWhitespaces), Rec(() => Expression)
+                );
         private static readonly Pidgin.Parser<char, IAcui> AcuiMessage =
                 Map(
                     (_lparen, ident, expr, _rparen) =>
@@ -75,7 +102,7 @@ namespace acui.Parser
         private static readonly Pidgin.Parser<char, IAcui> AcuiString = String.Select<IAcui>(s => new AcuiStringLiteral { value = s });
         private static readonly Pidgin.Parser<char, IAcui> AcuiInteger = Num.Select<IAcui>(value => new AcuiIntegerLiteral { value = value });
         private static readonly Pidgin.Parser<char, IAcui> Expression = OneOf(AcuiString, AcuiInteger, AcuiMessage, AcuiFunctionCall);
-        private static readonly Pidgin.Parser<char, IAcui> Statement = OneOf(Expression).Before(EndOfStatement);
+        private static readonly Pidgin.Parser<char, IAcui> Statement = OneOf(AcuiReply, AcuiVarDecl, AcuiVarAssign, Expression).Before(EndOfStatement);
         private static readonly Pidgin.Parser<char, IAcui> Replies = String("->").Between(SkipWhitespaces).Then(AcuiIdentifier);
         private static readonly Pidgin.Parser<char, IAcuiTopLevel> FunctionDefinition =
                 Map(

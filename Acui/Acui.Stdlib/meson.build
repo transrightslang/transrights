@@ -1,8 +1,12 @@
 foundation_kit_src = [
-    'FoundationKit/Foundation.c',
+    'FoundationKit/Objects.c',
+    'FoundationKit/Logger.c',
 ]
 foundation_kit_h = [
     'FoundationKit/Foundation.h',
+    'FoundationKit/Objects.h',
+    'FoundationKit/Logger.h',
+    'FoundationKit/CUtil.h',
 ]
 library = shared_library('AcuiFoundationKit',
                          foundation_kit_src,

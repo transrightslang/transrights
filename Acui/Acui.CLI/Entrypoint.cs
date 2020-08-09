@@ -29,6 +29,7 @@ namespace acui.CLI
                     process.StartInfo.ArgumentList.Add("-g");
                     process.StartInfo.ArgumentList.Add("-o");
                     process.StartInfo.ArgumentList.Add(opts.output);
+                    process.StartInfo.ArgumentList.Add("-w");
                     process.StartInfo.ArgumentList.Add("-x");
                     process.StartInfo.ArgumentList.Add("c");
                     process.StartInfo.ArgumentList.Add("-");
@@ -40,6 +41,13 @@ namespace acui.CLI
                     var writer = process.StandardInput;
 
                     writer.WriteLine($"#include <FoundationKit/Foundation.h>");
+
+                    if (opts.verbose) {
+                        foreach (var item in result.Value)
+                        {
+                            Console.WriteLine($"{item}");
+                        }
+                    }
 
                     foreach (var item in result.Value)
                     {

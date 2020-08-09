@@ -23,7 +23,7 @@ namespace acui.AST
             return $"func {name.reference} {string.Join(' ', arguments.ConvertAll(a => a.Item1.ToString() + ":" + a.Item2.ToString()))} {(replies != null ? "-> " + replies.ToString() : "")} {'{'}\n{string.Join('\n', statements.ConvertAll(s => '\t'+s.ToString()))}\n{'}'}";
         }
         public string Transpile() =>
-            $"{(replies != null ? replies.Transpile() : "void")} {name.reference} ({string.Join(", ", arguments.ConvertAll(a => a.Item2.Transpile() + " " + a.Item1.Transpile()))}) {'{'}\n{(name.reference == "main" ? "acui_initRuntime();\n" : "")}{string.Join("\n", statements.ConvertAll(s => '\t'+s.Transpile()+";"))}\n{'}'}";
+            $"{(replies != null ? replies.Transpile() : "void")} {name.reference} ({string.Join(", ", arguments.ConvertAll(a => a.Item2.Transpile() + " " + a.Item1.Transpile()))}) {'{'}\n{string.Join("\n", statements.ConvertAll(s => '\t'+s.Transpile()+";"))}\n{'}'}";
     }
     public class AcuiImport : IAcuiTopLevel
     {
@@ -53,6 +53,29 @@ namespace acui.AST
         public override string ToString() => value.ToString();
         public string Transpile() => value.ToString();
     }
+    ///
+    /// Statements
+    ///
+    public class AcuiVariableDefinition : IAcuiStatement
+    {
+        public AcuiIdentifierLiteral name { get; set; }
+        public IAcuiExpr value { get; set; }
+        public override string ToString() => $"{name} := {value}";
+        public string Transpile() => $"__auto_type {name.Transpile()} = {value.Transpile()}";
+    }
+    public class AcuiVariableAssignment : IAcuiStatement
+    {
+        public AcuiIdentifierLiteral name { get; set; }
+        public IAcuiExpr value { get; set; }
+        public override string ToString() => $"{name} = {value}";
+        public string Transpile() => $"{name} = {value}";
+    }
+    public class AcuiReply : IAcuiStatement
+    {
+        public IAcuiExpr value { get; set; }
+        public override string ToString() => $"reply {value}";
+        public string Transpile() => $"return {value}";
+    }
 
     ///
     /// Expressions
@@ -63,14 +86,16 @@ namespace acui.AST
         public List<(string, IAcuiExpr)> selectors { get; set; }
         public override string ToString()
         {
-            return $"({target} {string.Join(" ", selectors.ConvertAll(item => $"{item.Item1}:{item.Item2}"))})";
+            return $"({target} {string.Join(" ", selectors.ConvertAll(item => $"{(item.Item2 == null ? $".{item.Item1}" : $"{item.Item1}:{item.Item2}")}"))})";
         }
         public string Transpile() {
             var selector = new List<string>();
             var values = new List<string>();
             foreach (var item in selectors) {
                 selector.Add(item.Item1);
-                values.Add(item.Item2.Transpile());
+                if (item.Item2 != null) {
+                    values.Add(item.Item2.Transpile());
+                }
             }
             var args = new List<string>();
             args.Add($"\":{string.Join(':', selector)}\"");

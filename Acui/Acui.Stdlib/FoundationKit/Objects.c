@@ -1,29 +1,8 @@
-#include <stdarg.h>
-#include <string.h>
-#include <stdio.h>
+#include "stdarg.h"
+#include "stdlib.h"
+#include "string.h"
 
-#include "Foundation.h"
-
-void acui_logger(Object* self, void* data)
-{
-    printf((const char*)data);
-}
-
-void acui_initRuntime()
-{
-    Logger = (Object*)malloc(sizeof(Object));
-
-    Class* loggerClass = (Class*)malloc(sizeof(Class));
-    loggerClass->name = "Logger";
-
-    Method loggerPrint;
-    loggerPrint.signature = ":print";
-    loggerPrint.functionPointer = acui_logger;
-
-    loggerClass->methods[0] = loggerPrint;
-
-    Logger->objectClass = loggerClass;
-}
+#include "Objects.h"
 
 void* acui_sendMessage(Object* self, const char* sel, size_t count, ...)
 {
@@ -39,7 +18,7 @@ void* acui_sendMessage(Object* self, const char* sel, size_t count, ...)
     }
     va_end(args);
 
-    for (Method* method = self->objectClass->methods; method != NULL; method++) {
+    for (Method* method = self->isClass ? ((Class*)self)->methods : self->objectClass->methods; method != NULL; method++) {
         if (strcmp(sel, method->signature) == 0) {
             switch (maxCount) {
             case 0: return ((void* (*)(Object*))method->functionPointer)(self);
