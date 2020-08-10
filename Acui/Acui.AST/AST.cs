@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace acui.AST
@@ -20,7 +21,7 @@ namespace acui.AST
         public List<(AcuiIdentifierLiteral,AcuiIdentifierLiteral)> arguments { get; set; }
         public List<IAcuiStatement> statements { get; set; }
         public override string ToString() {
-            return $"func {name.reference} {string.Join(' ', arguments.ConvertAll(a => a.Item1.ToString() + ":" + a.Item2.ToString()))} {(replies != null ? "-> " + replies.ToString() : "")} {'{'}\n{string.Join('\n', statements.ConvertAll(s => '\t'+s.ToString()))}\n{'}'}";
+            return $"func {name.reference} {string.Join(' ', arguments.ConvertAll(a => a.Item1.ToString() + ":" + a.Item2.ToString()))}{(replies != null ? "-> " + replies.ToString() : "")} {'{'}\n{string.Join('\n', statements.ConvertAll(s => '\t'+s.ToString()))}\n{'}'}";
         }
         public string Transpile() =>
             $"{(replies != null ? replies.Transpile() : "void")} {name.reference} ({string.Join(", ", arguments.ConvertAll(a => a.Item2.Transpile() + " " + a.Item1.Transpile()))}) {'{'}\n{string.Join("\n", statements.ConvertAll(s => '\t'+s.Transpile()+";"))}\n{'}'}";

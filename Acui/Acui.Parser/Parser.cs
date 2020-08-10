@@ -83,7 +83,7 @@ namespace acui.Parser
                         };
                         return message;
                     },
-                    LParen, AcuiIdentifier, Rec(() => AcuiSelector.Between(SkipWhitespaces).Many()).Between(SkipWhitespaces), RParen
+                    LParen.Then(SkipWhitespaces), AcuiIdentifier, Rec(() => AcuiSelector.Between(SkipWhitespaces).Many()).Between(SkipWhitespaces), RParen
                 );
         private static readonly Pidgin.Parser<char, IAcui> AcuiFunctionCall =
             Map(
