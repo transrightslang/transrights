@@ -21,6 +21,6 @@ const char* foundation_string_value(Object* self)
 }
 
 ClassInitFunction(String)
-    ClassMethod(String, 0, ":create", foundation_string_new)
-    ClassMethod(String, 1, ":value", foundation_string_value)
+    ClassMethod(String, ":create", foundation_string_new)
+    ClassMethod(String, ":value", foundation_string_value)
 EndClassInitFunction

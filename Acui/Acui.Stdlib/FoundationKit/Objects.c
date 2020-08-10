@@ -33,7 +33,8 @@ void* acui_sendMessage(Object* self, const char* sel, size_t count, ...)
     }
     va_end(args);
 
-    for (Method* method = self->isClass ? ((Class*)self)->methods : self->objectClass->methods; method != NULL; method++) {
+    for (MethodList* methodList = self->isClass ? ((Class*)self)->methods : self->objectClass->methods; methodList != NULL; methodList = methodList->next) {
+        Method* method = &methodList->method;
         if (strcmp(sel, method->signature) == 0) {
             switch (maxCount) {
             case 0: return ((void* (*)(Object*))method->functionPointer)(self);
@@ -45,4 +46,12 @@ void* acui_sendMessage(Object* self, const char* sel, size_t count, ...)
     }
 
     return NULL;
+}
+
+MethodList* acui_methodListPrepend(MethodList* methodList, Method method)
+{
+    MethodList* retList = (MethodList*)malloc(sizeof(MethodList));
+    retList->method = method;
+    retList->next = methodList;
+    return retList;
 }
