@@ -3,18 +3,20 @@
 
 #include <stdio.h>
 
-void foundation_logger_print(Object* self, void* data)
+void foundation_logger_print(Object* self, Object* data)
 {
-    printf("%s\n", (const char*)data);
+    printf("%s\n", (const char*)(acui_sendMessage(data, ":value", 0)));
 }
 
-void foundation_logger_print_eol(Object* self, void* data, void* data2)
+void foundation_logger_print_eol(Object* self, Object* data, Object* data2)
 {
-    printf("%s%s", (const char*)data, (const char*)data2);
+    printf("%s%s", (const char*)(acui_sendMessage(data, ":value", 0)), (const char*)(acui_sendMessage(data2, ":value", 0)));
 }
 
 Object* foundation_logger_new() {
     Constructor(Logger)
+    printf("constructing logger %p\n", obj);
+    return obj;
 }
 
 ClassInitFunction(Logger)

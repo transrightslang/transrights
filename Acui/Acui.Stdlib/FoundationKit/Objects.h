@@ -14,6 +14,7 @@ typedef struct Class Class;
 typedef struct {
     Class* objectClass;
     bool isClass;
+    int refCount;
 } Object;
 
 typedef struct Class {
@@ -23,3 +24,5 @@ typedef struct Class {
 } Class;
 
 void* acui_sendMessage(Object* self, const char* sel, size_t count, ...);
+void acui_refUp(Object* obj);
+void acui_refDown(Object** obj);

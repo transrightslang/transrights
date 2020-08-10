@@ -3,4 +3,4 @@
 #include "Objects.h"
 #include "CUtil.h"
 
-DeclareClassObject(Logger)
+DeclareClassObject(String)

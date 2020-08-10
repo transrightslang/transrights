@@ -1,8 +1,23 @@
 #include "stdarg.h"
 #include "stdlib.h"
 #include "string.h"
+#include "stdio.h"
 
 #include "Objects.h"
+
+void acui_refUp(Object* obj)
+{
+    obj->refCount++;
+}
+
+void acui_refDown(Object** obj)
+{
+    (*obj)->refCount--;
+    if ((*obj)->refCount <= 0) {
+        acui_sendMessage((*obj), ":destruct", 0);
+        free((*obj));
+    }
+}
 
 void* acui_sendMessage(Object* self, const char* sel, size_t count, ...)
 {

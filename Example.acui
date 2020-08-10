@@ -1,6 +1,5 @@
 func main -> int {
     logger := (Logger .create)
-    (logger print:`hello`)
-    (logger print:`hello` withEndOfLine:`\n\n`)
+    (logger print:`hello!`)
     reply 0
 }

@@ -10,8 +10,8 @@ void init_ ## class () {\
     method ## idx .signature = selector;\
     method ## idx .functionPointer = func;\
     class->methods[idx] = method ## idx;
-#define Constructor(class) Object* obj = (Object*)malloc(sizeof(Class));\
+#define Constructor(class) Object* obj = (Object*)malloc(sizeof(Object));\
     obj->objectClass = class;\
-    return obj;
+    obj->refCount = 1;\
 
 #define EndClassInitFunction }

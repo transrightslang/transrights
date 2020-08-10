@@ -45,7 +45,7 @@ namespace acui.AST
     {
         public string value { get; set; }
         public override string ToString() => '`' + value + '`';
-        public string Transpile() => $"\"{value}\"";
+        public string Transpile() => $"foundation_string_new(\"{value}\")";
     }
     public class AcuiIntegerLiteral : IAcuiLiteral
     {
@@ -61,7 +61,7 @@ namespace acui.AST
         public AcuiIdentifierLiteral name { get; set; }
         public IAcuiExpr value { get; set; }
         public override string ToString() => $"{name} := {value}";
-        public string Transpile() => $"__auto_type {name.Transpile()} = {value.Transpile()}";
+        public string Transpile() => $"__auto_type {name.Transpile()} __attribute__((__cleanup__(acui_refDown))) = {value.Transpile()}";
     }
     public class AcuiVariableAssignment : IAcuiStatement
     {
