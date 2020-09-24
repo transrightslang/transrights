@@ -12,7 +12,7 @@ module Main =
         match args.Head with
         | "compile" ->
             let file = System.IO.File.ReadAllText args.Tail.Head
-            match (parseProgram file) with
+            match (parseProgram file args.Tail.Head) with
                 | Success(output, _, _) ->
                     use proc = new System.Diagnostics.Process ()
                     proc.StartInfo.FileName <- "gcc"
@@ -32,6 +32,14 @@ module Main =
                     proc.StandardInput.WriteLine(compileProgram output)
                     proc.StandardInput.Close()
                     proc.WaitForExit()
+                    ignore ""
+                | Failure(fail, _, _) -> printfn "Failure: %s" fail
+        | "transpile" ->
+            let file = System.IO.File.ReadAllText args.Tail.Head
+            match (parseProgram file args.Tail.Head) with
+                | Success(output, _, _) ->
+                    printfn "#include <FoundationKit/Foundation.h>"
+                    printfn "%s" (compileProgram output)
                     ignore ""
                 | Failure(fail, _, _) -> printfn "Failure: %s" fail
         | _ -> ignore ""

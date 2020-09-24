@@ -4,6 +4,8 @@ module Parser =
     open FParsec
     open AST
 
+    let position: Parser<_,_> = fun stream -> FParsec.Reply stream.Position
+
     // Utilities
     let str s = pstring s
     let wrappedBy x y = between x x y
@@ -74,6 +76,7 @@ module Parser =
         skipWhitespace (str "reply") >>. anyExpression
 
     let anyStatement =
+        position .>>.
             ((attempt declarationStatement |>> Decl)
         <|> (attempt assignmentStatement |>> Assign)
         <|> (attempt replyStatement |>> Reply)
@@ -109,7 +112,7 @@ module Parser =
 
         spaces >>. topLevel |> many
 
-    let parseProgram = run program
+    let parseProgram programText filename = runParserOnString program () filename programText
 
     let test p str =
         match run p str with

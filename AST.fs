@@ -1,6 +1,8 @@
 namespace Rjiendaujughyi
 
 module AST =
+    open FParsec
+
     type Identifier = string
 
     type Literal =
@@ -23,12 +25,12 @@ module AST =
         | Reply of Expression
 
     type TopLevel =
-        | Func of name: Identifier * arguments: (Identifier * Identifier) list * replies: Identifier option * statements: Statement list
+        | Func of name: Identifier * arguments: (Identifier * Identifier) list * replies: Identifier option * statements: (Position * Statement) list
         | Import of string
 
     type ASTNode =
         | ASTTopLevel of TopLevel
-        | ASTStatement of Statement
+        | ASTStatement of (Position * Statement)
         | ASTDeclaration of Declaration
         | ASTAssignment of Assignment
         | ASTExpression of Expression

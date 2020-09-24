@@ -22,9 +22,6 @@ module Compiler =
         let joinWithPreceding delimter list =
             delimter + (join delimter list)
 
-        let indent item =
-            "\t" + item
-
         match node with
         | ASTTopLevel(topLevel) ->
             match topLevel with
@@ -33,20 +30,26 @@ module Compiler =
                         (unwrapOr replies "void")
                         (name)
                         (arguments |> List.map argument |> join ", ")
-                        (statements |> List.map(ASTStatement >> compile >> indent) |> joinWithTrailing ";\n" )
+                        (statements |> List.map(ASTStatement >> compile) |> joinWithTrailing ";\n" )
 
                 | Import(import) ->
                     sprintf "#include <%s.h>"
                         import
 
-        | ASTStatement(statement) ->
-            match statement with
-                | Expr(expr) -> expr |> (ASTExpression >> compile)
-                | Assign(assignment) -> assignment |> (ASTDeclaration >> compile)
-                | Decl(decl) -> decl |> (ASTDeclaration >> compile)
-                | Reply(reply) ->
-                    sprintf "return %s"
-                        (reply |> (ASTExpression >> compile))
+        | ASTStatement(position, statement) ->
+            let data =
+                match statement with
+                    | Expr(expr) -> expr |> (ASTExpression >> compile)
+                    | Assign(assignment) -> assignment |> (ASTDeclaration >> compile)
+                    | Decl(decl) -> decl |> (ASTDeclaration >> compile)
+                    | Reply(reply) ->
+                        sprintf "return %s"
+                            (reply |> (ASTExpression >> compile))
+
+            sprintf "#line %d \"%s\"\n%s"
+                position.Line
+                position.StreamName
+                data
 
         | ASTDeclaration(ident, expr) ->
             sprintf "__auto_type %s __attribute__((__cleanup__(acui_refDown))) = %s"
