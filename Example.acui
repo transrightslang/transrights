@@ -1,5 +1,5 @@
-func main -> int {
-    logger := (Logger .create)
-    (logger print:`hello!`)
+func main replies int {
+    logger := (Logger new)
+    (Logger print:`hello!` withEndOfLine:`\n`)
     reply 0
 }

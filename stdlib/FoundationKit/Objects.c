@@ -7,11 +7,18 @@
 
 void acui_refUp(Object* obj)
 {
+    if (obj == NULL) {
+        return;
+    }
     obj->refCount++;
 }
 
 void acui_refDown(Object** obj)
 {
+    if (*obj == NULL) {
+        return;
+    }
+
     (*obj)->refCount--;
     if ((*obj)->refCount <= 0) {
         acui_sendMessage((*obj), ":destruct", 0);

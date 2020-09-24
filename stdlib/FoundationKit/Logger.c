@@ -22,7 +22,7 @@ Object* foundation_logger_new() {
 }
 
 ClassInitFunction(Logger)
-    ClassMethod(Logger, ":create", foundation_logger_new)
+    ClassMethod(Logger, ":new", foundation_logger_new)
     ClassMethod(Logger, ":print", foundation_logger_print)
     ClassMethod(Logger, ":print:withEndOfLine", foundation_logger_print)
 EndClassInitFunction
