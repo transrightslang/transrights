@@ -5,6 +5,7 @@ module Main =
     open Parser
     open Compiler
     open FParsec
+    open Documentor
 
     [<EntryPoint>]
     let main argv =
@@ -41,6 +42,16 @@ module Main =
                     printfn "#include <FoundationKit/Foundation.h>"
                     printfn "%s" (compileProgram output)
                     ignore ""
+                | Failure(fail, _, _) -> printfn "Failure: %s" fail
+        | "parse" ->
+            let file = System.IO.File.ReadAllText args.Tail.Head
+            match (parseProgram file args.Tail.Head) with
+                | Success(output, _, _) -> printfn "Success: %A" output
+                | Failure(fail, _, _) -> printfn "Failure: %s" fail
+        | "document" ->
+            let file = System.IO.File.ReadAllText args.Tail.Head
+            match (parseProgram file args.Tail.Head) with
+                | Success(output, _, _) -> printfn "%s" (documentProgram output)
                 | Failure(fail, _, _) -> printfn "Failure: %s" fail
         | _ -> ignore ""
 

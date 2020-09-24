@@ -23,6 +23,9 @@ module Parser =
     let endOfStatement = semicolon <|> newlineReturn ";" <|> (eof >>% ";")
     let quote = str "`"
 
+    // Comment
+    let comment = str "//" >>. manyChars (noneOf "\n")
+
     // Literals
     let stringLiteral = manyChars (noneOf "`") |> wrappedBy quote |>> String
     let identifierLiteral: Parser<Identifier,unit> =
@@ -33,7 +36,10 @@ module Parser =
     let integerLiteral =
         pint64 |>> Integer
 
-    let anyLiteral = attempt stringLiteral <|> attempt (identifierLiteral |>> Ident) <|> attempt integerLiteral
+    let anyLiteral =
+            (attempt stringLiteral)
+        <|> (attempt (identifierLiteral |>> Ident))
+        <|> (integerLiteral)
 
     // Expressions
     let (anyExpression: Parser<Expression,unit>), anyExpressionImpl = createParserForwardedToRef()
@@ -62,7 +68,7 @@ module Parser =
     do anyExpressionImpl :=
             (attempt messageExpression)
         <|> (attempt functionCallExpression)
-        <|> (attempt anyLiteral |>> Lit)
+        <|> (anyLiteral |>> Lit)
 
     // Statements
     let assignmentLike sigil kind =
@@ -80,7 +86,8 @@ module Parser =
             ((attempt declarationStatement |>> Decl)
         <|> (attempt assignmentStatement |>> Assign)
         <|> (attempt replyStatement |>> Reply)
-        <|> (attempt anyExpression |>> Expr))
+        <|> (attempt comment |>> CommentStatement)
+        <|> (anyExpression |>> Expr))
         .>> endOfStatement
 
     // Toplevels
@@ -105,12 +112,13 @@ module Parser =
 
     let anyToplevel =
             (attempt functionToplevel)
-        <|> (attempt importToplevel)
+        <|> (attempt comment |>> Comment)
+        <|> (importToplevel)
 
     let program =
         let topLevel = anyToplevel .>> endOfStatement |> skipWhitespace
 
-        spaces >>. topLevel |> many
+        spaces >>. topLevel |> many1
 
     let parseProgram programText filename = runParserOnString program () filename programText
 

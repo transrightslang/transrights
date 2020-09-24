@@ -1,4 +1,6 @@
 func main replies int {
+    // main: The entrypoint of the program.
+
     logger := (Logger new)
     (Logger print:`hello!` withEndOfLine:`\n`)
     reply 0

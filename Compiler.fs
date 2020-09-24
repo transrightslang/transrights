@@ -23,6 +23,9 @@ module Compiler =
             delimter + (join delimter list)
 
         match node with
+        | ASTComment(comment) ->
+            sprintf "//%s" comment
+
         | ASTTopLevel(topLevel) ->
             match topLevel with
                 | Func(name, arguments, replies, statements) ->
@@ -36,12 +39,15 @@ module Compiler =
                     sprintf "#include <%s.h>"
                         import
 
+                | Comment(comment) -> comment |> (ASTComment >> compile)
+
         | ASTStatement(position, statement) ->
             let data =
                 match statement with
                     | Expr(expr) -> expr |> (ASTExpression >> compile)
                     | Assign(assignment) -> assignment |> (ASTDeclaration >> compile)
                     | Decl(decl) -> decl |> (ASTDeclaration >> compile)
+                    | CommentStatement(comment) -> comment |> (ASTComment >> compile)
                     | Reply(reply) ->
                         sprintf "return %s"
                             (reply |> (ASTExpression >> compile))
