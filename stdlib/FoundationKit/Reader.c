@@ -17,4 +17,5 @@ Object* foundation_reader_read(Object* self, const size_t count)
 
 ClassInitFunction(Reader)
     ClassMethod(Reader, ":new", foundation_reader_new)
+    ClassMethod(Reader, ":read:atMost:characters", foundation_reader_read)
 EndClassInitFunction
