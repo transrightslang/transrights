@@ -65,7 +65,7 @@ ClassInitFunction(String)
     ClassMethod(String, ":length", foundation_string_length)
     ClassMethod(String, ":append:with", foundation_string_append)
     ClassMethod(String, ":copy", foundation_string_copy)
-    ClassMethod(String, ":at", foundation_string_at)
+    ClassMethod(String, ":character:at", foundation_string_at)
     ClassMethod(String, ":set:at", foundation_string_set_at)
     ClassMethod(String, ":destruct", foundation_string_destruct)
 EndClassInitFunction
