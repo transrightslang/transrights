@@ -23,10 +23,12 @@ module AST =
         | Assign of Assignment
         | Decl of Declaration
         | Reply of Expression
+        | CommentStatement of string
 
     type TopLevel =
         | Func of name: Identifier * arguments: (Identifier * Identifier) list * replies: Identifier option * statements: (Position * Statement) list
         | Import of string
+        | Comment of string
 
     type ASTNode =
         | ASTTopLevel of TopLevel
@@ -36,3 +38,4 @@ module AST =
         | ASTExpression of Expression
         | ASTLiteral of Literal
         | ASTIdentifier of Identifier
+        | ASTComment of string
