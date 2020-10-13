@@ -4,6 +4,7 @@
 #include "stdio.h"
 
 #include "Objects.h"
+#include "CUtil.h"
 
 void acui_refUp(Object* obj)
 {
@@ -26,6 +27,18 @@ void acui_refDown(Object** obj)
     }
 }
 
+Method* lookupMethod(MethodList* methodList, const char* sel, size_t arity)
+{
+    for (MethodList* list = methodList; list != NULL; list = list->next) {
+        Method* item = &list->data;
+
+        if (strcmp(sel, item->signature) == 0 && item->arity == arity) {
+            return item;
+        }
+    }
+    return NULL;
+}
+
 void* acui_sendMessage(Object* self, const char* sel, size_t count, ...)
 {
     void* items[count];
@@ -40,16 +53,36 @@ void* acui_sendMessage(Object* self, const char* sel, size_t count, ...)
     }
     va_end(args);
 
-    for (MethodList* methodList = self->isClass ? ((Class*)self)->methods : self->objectClass->methods; methodList != NULL; methodList = methodList->next) {
-        Method* method = &methodList->method;
-        if (strcmp(sel, method->signature) == 0) {
-            switch (maxCount) {
-            case 0: return ((void* (*)(Object*))method->functionPointer)(self);
-            case 1: return ((void* (*)(Object*, void*))method->functionPointer)(self, items[0]);
-            case 2: return ((void* (*)(Object*, void*, void*))method->functionPointer)(self, items[0], items[1]);
-            case 3: return ((void* (*)(Object*, void*, void*, void*))method->functionPointer)(self, items[0], items[1], items[2]);
-            }
+    Method* foundMethod = lookupMethod(self->isClass ? ((Class*)self)->methods : self->objectClass->methods, sel, maxCount);
+    Class* parentClass = self->isClass ? NULL : self->objectClass->inherits;
+
+    while (foundMethod == NULL && parentClass != NULL) {
+        foundMethod = lookupMethod(parentClass->methods, sel, maxCount);
+        parentClass = parentClass->inherits;
+    }
+
+    if (foundMethod == NULL) {
+        if (strcmp(sel, ":unhandledMessage") == 0) {
+            printf("Fatal Runtime Error: Message unhandled");
+            abort();
+        } else if (strcmp(sel, ":destruct") == 0) {
+            return NULL;
         }
+        return acui_sendMessage(self, ":unhandledMessage", 1, sel);
+    }
+
+    switch (foundMethod->arity) {
+    case  0: return ((void* (*)(Object*))foundMethod->functionPointer)(self);
+    case  1: return ((void* (*)(Object*, void*))foundMethod->functionPointer)(self, items[0]);
+    case  2: return ((void* (*)(Object*, void*, void*))foundMethod->functionPointer)(self, items[0], items[1]);
+    case  3: return ((void* (*)(Object*, void*, void*, void*))foundMethod->functionPointer)(self, items[0], items[1], items[2]);
+    case  4: return ((void* (*)(Object*, void*, void*, void*, void*))foundMethod->functionPointer)(self, items[0], items[1], items[2], items[3]);
+    case  5: return ((void* (*)(Object*, void*, void*, void*, void*, void*))foundMethod->functionPointer)(self, items[0], items[1], items[2], items[3], items[4]);
+    case  6: return ((void* (*)(Object*, void*, void*, void*, void*, void*, void*))foundMethod->functionPointer)(self, items[0], items[1], items[2], items[3], items[4], items[5]);
+    case  7: return ((void* (*)(Object*, void*, void*, void*, void*, void*, void*, void*))foundMethod->functionPointer)(self, items[0], items[1], items[2], items[3], items[4], items[5], items[6]);
+    case  8: return ((void* (*)(Object*, void*, void*, void*, void*, void*, void*, void*, void*))foundMethod->functionPointer)(self, items[0], items[1], items[2], items[3], items[4], items[5], items[6], items[7]);
+    case  9: return ((void* (*)(Object*, void*, void*, void*, void*, void*, void*, void*, void*, void*))foundMethod->functionPointer)(self, items[0], items[1], items[2], items[3], items[4], items[5], items[6], items[7], items[8]);
+    case 10: return ((void* (*)(Object*, void*, void*, void*, void*, void*, void*, void*, void*, void*, void*))foundMethod->functionPointer)(self, items[0], items[1], items[2], items[3], items[4], items[5], items[6], items[7], items[8], items[9]);
     }
 
     return NULL;
@@ -58,7 +91,7 @@ void* acui_sendMessage(Object* self, const char* sel, size_t count, ...)
 MethodList* acui_methodListPrepend(MethodList* methodList, Method method)
 {
     MethodList* retList = (MethodList*)malloc(sizeof(MethodList));
-    retList->method = method;
+    retList->data = method;
     retList->next = methodList;
     return retList;
 }

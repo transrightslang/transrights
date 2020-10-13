@@ -7,12 +7,13 @@
 typedef struct Method {
     const char* signature;
     void* functionPointer;
+    int arity;
 } Method;
 
 typedef struct MethodList MethodList;
 
 typedef struct MethodList {
-    Method method;
+    Method data;
     MethodList* next;
 } MethodList;
 
@@ -28,6 +29,7 @@ typedef struct Class {
     Object metaObject;
     const char* name;
     MethodList* methods;
+    Class* inherits;
 } Class;
 
 void* acui_sendMessage(Object* self, const char* sel, size_t count, ...);
